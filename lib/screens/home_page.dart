@@ -317,13 +317,43 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    IconButton(onPressed: (){
-                      Provider.of<WeatherServiceProvider>(context, listen: false).fetchWeatherDataByCity(_cityController.text.toString());
-                    }, icon: Icon(Icons.search,color: Colors.white,))
+                    // Use a Builder widget to get the context within the onPressed callback
+                    Builder(
+                      builder: (context) => IconButton(
+                        onPressed: () async {
+                          // Show the CircularProgressIndicator
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(width: 10),
+                                  Text("Fetching data..."),
+                                ],
+                              ),
+                            ),
+                          );
+
+                          try {
+                            await Future.delayed(Duration(seconds: 3));
+                            // Fetch weather data
+                            await Provider.of<WeatherServiceProvider>(context, listen: false)
+                                .fetchWeatherDataByCity(_cityController.text.toString());
+                          } catch (error) {
+                            // Handle errors if necessary
+                          } finally {
+                            // Hide the CircularProgressIndicator
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          }
+                        },
+                        icon: Icon(Icons.search, color: Colors.white),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
+
           ],
         ),
       ),
